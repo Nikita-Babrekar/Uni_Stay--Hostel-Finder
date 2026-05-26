@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UniStay - Your College Home Awaits</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <nav class="navbar glass">
+        <div class="container">
+            <a href="index.html" class="navbar-brand">
+                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>
+                Uni<span>Stay</span>
+            </a>
+        </div>
+    </nav>
+
+   
+    <section class="hero">
+        <div class="blob blob-1"></div>
+        <div class="blob blob-2"></div>
+        
+        <div class="hero-content container animate-fade-in">
+            <div class="hero-text">
+                <h1>Find the Perfect Hostel Near Your College.</h1>
+                <p>UniStay connects students with premium, verified hostels. Explore amenities, view real photos, and connect directly with owners. A seamless experience for your home away from home.</p>
+                <div style="display: flex; gap: 1rem;">
+                    <span class="feature-tag" style="font-size: 1rem; padding: 0.5rem 1rem;">100% Verified</span>
+                    <span class="feature-tag" style="font-size: 1rem; padding: 0.5rem 1rem;">Real Reviews</span>
+                    <span class="feature-tag" style="font-size: 1rem; padding: 0.5rem 1rem;">Map Integration</span>
+                </div>
+            </div>
+            
+            <div class="hero-form-container">
+                <div class="auth-card glass">
+                    <h2 class="text-center mb-4">Welcome Back</h2>
+                    
+                    <div class="role-toggle">
+                        <button class="role-btn active" data-role="student" onclick="toggleRole('student')">Student</button>
+                        <button class="role-btn" data-role="owner" onclick="toggleRole('owner')">Hostel Owner</button>
+                    </div>
+
+                    <form id="loginForm">
+                        <div class="form-group">
+                            <label class="form-label">Username</label>
+                            <input type="text" id="username" class="form-control" placeholder="student / owner" required>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Password</label>
+                            <input type="password" id="password" class="form-control" placeholder="123" required>
+                        </div>
+                        <button type="submit" class="btn btn-primary btn-block">Login to UniStay</button>
+                    </form>
+                    
+                    <p class="text-center mt-4" style="font-size: 0.875rem;">
+                        Use credentials: <br>
+                        <b>Student:</b> student / 123 <br>
+                        <b>Owner:</b> owner / 123
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <script src="app.js"></script>
+</body>
+</html>
+
+
+
+
+
+
+
+
+
+ 

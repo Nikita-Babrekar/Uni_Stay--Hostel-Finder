@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Dashboard - UniStay</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <nav class="navbar glass">
+        <div class="container" style="max-width: 100%; padding: 0 2rem;">
+            <a href="student-dashboard.html" class="navbar-brand">
+                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>
+                Uni<span>Stay</span>
+            </a>
+            <div class="nav-links">
+                <span id="userNameDisplay" style="font-weight: 600; color: var(--primary);">Student</span>
+                <button class="btn btn-outline" onclick="logout()">Logout</button>
+            </div>
+        </div>
+    </nav>
+
+    <div class="dashboard-layout">
+        <aside class="sidebar" style="padding-bottom: 4rem;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+                <h3 style="margin-bottom: 0;">Advanced Filters</h3>
+                <button class="btn btn-outline" style="padding: 0.25rem 0.75rem; font-size: 0.75rem; border: none;" onclick="resetFilters()">Reset</button>
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label">Search College/Location</label>
+                <input type="text" id="searchCollege" class="form-control" placeholder="Enter city, college, or hostel name...">
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Hostel Type</label>
+                <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+                    <label style="cursor: pointer;"><input type="radio" name="hType" value="all" checked> All</label>
+                    <label style="cursor: pointer;"><input type="radio" name="hType" value="Boys"> Boys</label>
+                    <label style="cursor: pointer;"><input type="radio" name="hType" value="Girls"> Girls</label>
+                    <label style="cursor: pointer;"><input type="radio" name="hType" value="Co-ed"> Co-ed</label>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Price Range (Monthly)</label>
+                <input type="range" id="priceRange" min="4000" max="25000" step="500" value="25000" style="width: 100%;" oninput="document.getElementById('priceVal').innerText = 'Up to ₹' + parseInt(this.value).toLocaleString()">
+                <div style="display: flex; justify-content: space-between; font-size: 0.875rem; color: var(--text-muted);">
+                    <span>₹4,000</span>
+                    <span id="priceVal">Up to ₹25,000</span>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Room Specifications</label>
+                <select class="form-control form-select mb-2" id="acFilter">
+                    <option value="all">Any AC/Non-AC</option>
+                    <option value="ac">AC Room</option>
+                    <option value="non-ac">Non-AC Room</option>
+                </select>
+                <select class="form-control form-select" id="bedFilter">
+                    <option value="all">Any Bed Type</option>
+                    <option value="Single">Single Bed</option>
+                    <option value="Double">Double Bed</option>
+                    <option value="Multiple/Mixed">Multiple/Mixed</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Amenities</label>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem; font-size: 0.9rem;">
+                    <label style="cursor: pointer;"><input type="checkbox" class="amenity-cb" value="WiFi"> WiFi</label>
+                    <label style="cursor: pointer;"><input type="checkbox" class="amenity-cb" value="Laundry"> Laundry</label>
+                    <label style="cursor: pointer;"><input type="checkbox" class="amenity-cb" value="Gym"> Gym</label>
+                    <label style="cursor: pointer;"><input type="checkbox" class="amenity-cb" value="Library"> Library</label>
+                    <label style="cursor: pointer;"><input type="checkbox" class="amenity-cb" value="Pool"> Pool</label>
+                    <label style="cursor: pointer;"><input type="checkbox" class="amenity-cb" value="Power"> Power Backup</label>
+                </div>
+            </div>
+
+            <button class="btn btn-primary btn-block mt-4" onclick="applyAdvancedFilters()" style="position: sticky; bottom: 0; z-index: 10;">Apply Filters</button>
+        </aside>
+
+        <main class="main-content">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+                <h2>Explore Nearby Hostels</h2>
+                <div class="feature-tag" id="resultsCount">Loading Available Hostels...</div>
+            </div>
+
+            <div id="map" style="height: 400px; width: 100%; border-radius: 12px; margin-bottom: 20px; z-index: 1;"></div>
+
+            <div class="hostel-grid" id="hostelList"></div>
+        </main>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>

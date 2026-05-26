@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hostel Detail - UniStay</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <!-- Navigation -->
+    <nav class="navbar glass">
+        <div class="container">
+            <a href="student-dashboard.html" class="navbar-brand">
+                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>
+                Uni<span>Stay</span>
+            </a>
+            <div class="nav-links">
+                <a href="student-dashboard.html" class="btn btn-outline">Back to Search</a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container" style="padding-top: 100px;">
+        
+        <!-- Hero Header & Gallery (Injected by app.js) -->
+        <div id="detailGallery" class="animate-fade-in mb-4">
+            <!-- Gallery injected dynamically -->
+        </div>
+        
+        <div style="display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 2rem;" class="animate-fade-in">
+            <div>
+                <h1 id="detailName" style="font-size: 2.5rem; margin-bottom: 0.25rem;">Loading...</h1>
+                <p id="detailLocation" style="font-size: 1.1rem; color: var(--text-muted);">Loading...</p>
+            </div>
+            <div style="text-align: right;">
+                <p style="font-size: 0.875rem; color: var(--text-muted); margin-bottom: 0.25rem;">Starting from</p>
+                <h2 id="detailPrice" style="font-size: 2rem; color: var(--primary);">₹0/month</h2>
+                <button class="btn btn-primary mt-2" style="padding: 0.75rem 2rem; font-size: 1.1rem; box-shadow: var(--shadow-glow);" onclick="window.location.href='booking.html'">Book Now</button>
+            </div>
+        </div>
+
+        <div class="detail-grid animate-slide-up" style="animation-delay: 0.2s;">
+            <!-- Main Info -->
+            <div id="detailInfo">
+                <!-- Dynamically injected by app.js -->
+            </div>
+
+            <!-- Sidebar Info -->
+            <div>
+                <div class="info-section sticky" style="top: 100px;">
+                    <h2>Contact Owner</h2>
+                    <p class="mb-4">Interested in this hostel? Get in touch with the owner for a visit.</p>
+                    
+                    <form onsubmit="event.preventDefault(); alert('Message Sent!');">
+                        <div class="form-group">
+                            <label class="form-label">Your Message</label>
+                            <textarea class="form-control" rows="4" placeholder="Hi, I'd like to schedule a visit..."></textarea>
+                        </div>
+                        <button type="submit" class="btn btn-primary btn-block">Send Message</button>
+                    </form>
+
+                    <hr style="border-color: var(--border); margin: 1.5rem 0;">
+                    
+                    <button class="btn btn-outline btn-block">View Approved Documents</button>
+                    <p style="font-size: 0.75rem; color: var(--success); text-align: center; margin-top: 0.5rem;">
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align: middle;"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
+                        Verified by UniStay
+                    </p>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
