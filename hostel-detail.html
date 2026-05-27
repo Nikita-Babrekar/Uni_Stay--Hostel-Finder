@@ -6,10 +6,47 @@
     <title>Hostel Detail - UniStay</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
+    
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+    <style>
+        .detail-tabs { display: flex; gap: 1.5rem; border-bottom: 1px solid var(--border); margin-bottom: 1.5rem; padding-bottom: 0.25rem; }
+        .detail-tab-btn { background: none; border: none; color: var(--text-muted); font-size: 1rem; font-weight: 600; padding: 0.5rem 0; cursor: pointer; transition: all 0.2s; position: relative; }
+        .detail-tab-btn.active { color: var(--primary); }
+        .detail-tab-btn.active::after { content: ''; position: absolute; bottom: -5px; left: 0; width: 100%; height: 2px; background: var(--primary); }
+        .tab-panel { display: none; animation: fadeIn 0.3s ease-in-out forwards; }
+        .tab-panel.active { display: block; }
+        
+        /* Blueprint Specifications Card Styles */
+        .blueprint-spec-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 1.25rem; margin-top: 1rem; }
+        .spec-card { background: rgba(255, 255, 255, 0.02); border: 1px solid var(--border); padding: 1rem 1.25rem; border-radius: 12px; display: flex; align-items: center; gap: 1rem; }
+        .spec-icon { width: 40px; height: 40px; border-radius: 8px; background: rgba(var(--primary-rgb), 0.08); display: flex; align-items: center; justify-content: center; color: var(--primary); font-size: 1.2rem; flex-shrink: 0; }
+        .spec-info { display: flex; flex-direction: column; }
+        .spec-label { color: var(--text-muted); font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 2px; }
+        .spec-value { color: var(--text-main); font-weight: 600; font-size: 1rem; }
+        
+        /* Staff Roster Design */
+        .staff-card-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 1.25rem; margin-top: 1rem; }
+        .staff-profile-card { background: rgba(255, 255, 255, 0.02); border: 1px solid var(--border); padding: 1.5rem; border-radius: 14px; display: flex; align-items: center; gap: 1rem; }
+        .staff-avatar { width: 48px; height: 48px; border-radius: 50%; background: linear-gradient(135deg, var(--primary), #8b5cf6); display: flex; align-items: center; justify-content: center; color: white; font-weight: 700; font-size: 1.1rem; }
+        
+        /* Expanded Amenities Grid for Overview */
+        .amenities-detailed-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 1rem; margin-top: 1.5rem; }
+        .amenity-detailed-card { background: rgba(255, 255, 255, 0.01); border: 1px solid var(--border); border-radius: 12px; padding: 1.25rem; transition: transform 0.2s, border-color 0.2s; }
+        .amenity-detailed-card:hover { border-color: var(--primary); transform: translateY(-2px); }
+        .amenity-header { display: flex; align-items: center; gap: 0.75rem; margin-bottom: 0.5rem; }
+        .amenity-title { font-weight: 600; color: var(--text-main); font-size: 1rem; }
+        .amenity-desc { font-size: 0.875rem; color: var(--text-muted); line-height: 1.5; }
+        .amenity-badge { background: rgba(16, 185, 129, 0.1); color: #10b981; font-size: 0.75rem; font-weight: 600; padding: 2px 8px; border-radius: 20px; margin-left: auto; }
+
+        @media (max-width: 768px) {
+            .blueprint-spec-grid, .amenities-detailed-grid { grid-template-columns: 1fr; }
+        }
+    </style>
 </head>
 <body>
 
-    <!-- Navigation -->
     <nav class="navbar glass">
         <div class="container">
             <a href="student-dashboard.html" class="navbar-brand">
@@ -24,10 +61,7 @@
 
     <div class="container" style="padding-top: 100px;">
         
-        <!-- Hero Header & Gallery (Injected by app.js) -->
-        <div id="detailGallery" class="animate-fade-in mb-4">
-            <!-- Gallery injected dynamically -->
-        </div>
+        <div id="detailGallery" class="animate-fade-in mb-4"></div>
         
         <div style="display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 2rem;" class="animate-fade-in">
             <div>
@@ -42,31 +76,104 @@
         </div>
 
         <div class="detail-grid animate-slide-up" style="animation-delay: 0.2s;">
-            <!-- Main Info -->
-            <div id="detailInfo">
-                <!-- Dynamically injected by app.js -->
+            <div>
+                <div class="info-section mb-4" style="display: flex; gap: 2rem; background: rgba(var(--primary-rgb), 0.04); border-left: 4px solid var(--primary); padding: 1.25rem 1.5rem; border-radius: 0 12px 12px 0;">
+                    <div>
+                        <small style="color: var(--text-muted); display: block; font-size:0.75rem; text-transform:uppercase; font-weight:600; letter-spacing:0.5px; margin-bottom:4px;">Drinking Water Quality</small>
+                        <strong id="detailWater" style="font-size: 1.05rem; color: #10b981;">Checking verification...</strong>
+                    </div>
+                    <div>
+                        <small style="color: var(--text-muted); display: block; font-size:0.75rem; text-transform:uppercase; font-weight:600; letter-spacing:0.5px; margin-bottom:4px;">Mess & Catering Layout</small>
+                        <strong id="detailMess" style="font-size: 1.05rem;">Loading details...</strong>
+                    </div>
+                </div>
+
+                <div class="info-section mb-4">
+                    <div class="detail-tabs">
+                        <button class="detail-tab-btn active" onclick="switchDetailViewTab(event, 'pane-about')">Overview</button>
+                        <button class="detail-tab-btn" onclick="switchDetailViewTab(event, 'pane-rooms')">Room & Layout Specifications</button>
+                        <button class="detail-tab-btn" onclick="switchDetailViewTab(event, 'pane-staff')">Management & Staff Roster</button>
+                    </div>
+
+                    <div id="pane-about" class="tab-panel active">
+                        <div style="line-height: 1.8; color: var(--text-main); margin-bottom: 2rem;">
+                            <p id="detailDescription" style="margin-bottom: 1.25rem; font-size: 1.05rem;"></p>
+                            <p style="color: var(--text-muted); font-size: 0.95rem;">
+                                Engineered from the ground up specifically to provide an immersive academic atmosphere, this premier student complex balances premium security frameworks with spacious, distraction-free studying ecosystems. Each element—from room architecture down to utility mapping—undergoes rigorous on-site screening by our curation team to confirm physical structural matching before receiving platform listing approval.
+                            </p>
+                        </div>
+                        
+                        <h3 style="font-size: 1.35rem; margin-bottom: 0.25rem; font-weight: 700;">Included Facilities & Infrastructure Specs</h3>
+                        <p style="font-size:0.875rem; color:var(--text-muted); margin-bottom:1.25rem;">Granular operational parameters and performance capacities tracked for this property listing.</p>
+                        
+                        <div class="amenities-detailed-grid">
+                            <div class="amenity-detailed-card">
+                                <div class="amenity-header">
+                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#8b5cf6" stroke-width="2"><path d="M5 12.55a11 11 0 0 1 14.08 0"></path><path d="M1.42 9a16 16 0 0 1 21.16 0"></path><path d="M8.58 16.14a7 7 0 0 1 6.83 0"></path><line x1="12" y1="20" x2="12.01" y2="20" stroke-width="3"></line></svg>
+                                    <span class="amenity-title">High-Speed WiFi</span>
+                                    <span class="amenity-badge">150 Mbps</span>
+                                </div>
+                                <p class="amenity-desc">Dedicated commercial-grade fiber architecture with localized mesh routers per floor zone. Configured with an symmetric layout ensuring low-latency bandwidth for continuous remote development, online tests, and heavy media compilation.</p>
+                            </div>
+
+                            <div class="amenity-detailed-card">
+                                <div class="amenity-header">
+                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#8b5cf6" stroke-width="2"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path><polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline><line x1="12" y1="22.08" x2="12" y2="12"></line></svg>
+                                    <span class="amenity-title">CCTV Security Matrix</span>
+                                    <span class="amenity-badge">24/7 Monitoring</span>
+                                </div>
+                                <p class="amenity-desc">Comprehensive hardware camera coverage arrays stationed across all common spaces, entrance pathways, and external boundaries. Feeds directly connect to a localized security roster room while preserving individual privacy partitions.</p>
+                            </div>
+
+                            <div class="amenity-detailed-card">
+                                <div class="amenity-header">
+                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#8b5cf6" stroke-width="2"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path></svg>
+                                    <span class="amenity-title">Professional Laundry</span>
+                                    <span class="amenity-badge">Bi-Weekly</span>
+                                </div>
+                                <p class="amenity-desc">Integrated heavy machinery wash cycles operated by localized staff units. Features structured pickup scheduling workflows designed to provide smooth automated fabric sorting and crisp curation treatments without conflicting with coursework timings.</p>
+                            </div>
+
+                            <div class="amenity-detailed-card">
+                                <div class="amenity-header">
+                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#8b5cf6" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
+                                    <span class="amenity-title">Power Backup Systems</span>
+                                    <span class="amenity-badge">100% Automatic</span>
+                                </div>
+                                <p class="amenity-desc">Heavy commercial diesel generator configuration equipped with auto-switch mechanics. Provides continuous current tracking pipelines to guarantee that climate configurations, internet systems, and student desks never drop power grids during outages.</p>
+                            </div>
+                        </div>
+
+                        <div id="detailAmenitiesTags" style="display: none;"></div>
+                    </div>
+
+                    <div id="pane-rooms" class="tab-panel">
+                        <h3 style="font-size: 1.25rem; margin-bottom: 0.5rem;">Structural Living Layout</h3>
+                        <p style="font-size:0.9rem; color:var(--text-muted); margin-bottom:1.5rem;">Verified physical space mapping across custom structural elements.</p>
+                        <div id="blueprintsContainer" class="blueprint-spec-grid"></div>
+                    </div>
+
+                    <div id="pane-staff" class="tab-panel">
+                        <h3 style="font-size: 1.25rem; margin-bottom: 0.5rem;">On-Site Support Personnel</h3>
+                        <p style="font-size:0.9rem; color:var(--text-muted); margin-bottom:1.5rem;">Background-checked professional workspace operators assigned directly to this location.</p>
+                        <div class="staff-card-grid" id="staffPersonnelContainer"></div>
+                    </div>
+                </div>
             </div>
 
-            <!-- Sidebar Info -->
             <div>
                 <div class="info-section sticky" style="top: 100px;">
-                    <h2>Contact Owner</h2>
-                    <p class="mb-4">Interested in this hostel? Get in touch with the owner for a visit.</p>
+                    <h2 style="font-size: 1.4rem; font-weight: 700; margin-bottom: 0.5rem; display: flex; align-items: center; gap: 0.5rem;">
+                        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--primary)" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
+                        Property Location
+                    </h2>
+                    <p class="mb-4" style="color: var(--text-muted); font-size: 0.9rem;">Real-time interactive routing and spatial landscape mapping for this verified property listing zone.</p>
                     
-                    <form onsubmit="event.preventDefault(); alert('Message Sent!');">
-                        <div class="form-group">
-                            <label class="form-label">Your Message</label>
-                            <textarea class="form-control" rows="4" placeholder="Hi, I'd like to schedule a visit..."></textarea>
-                        </div>
-                        <button type="submit" class="btn btn-primary btn-block">Send Message</button>
-                    </form>
+                    <div id="detailHostelMap" style="width: 100%; height: 320px; border-radius: 12px; border: 1px solid var(--border); box-shadow: var(--shadow-sm); background: rgba(0,0,0,0.2); z-index: 1;"></div>
 
-                    <hr style="border-color: var(--border); margin: 1.5rem 0;">
-                    
-                    <button class="btn btn-outline btn-block">View Approved Documents</button>
-                    <p style="font-size: 0.75rem; color: var(--success); text-align: center; margin-top: 0.5rem;">
-                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align: middle;"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
-                        Verified by UniStay
+                    <p style="font-size: 0.75rem; color: var(--success); text-align: center; margin-top: 1.25rem; display: flex; align-items: center; justify-content: center; gap: 4px;">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
+                        Fully Verified & Compliance Approved by UniStay
                     </p>
                 </div>
             </div>
@@ -75,5 +182,36 @@
     </div>
 
     <script src="app.js"></script>
+    <script>
+        function switchDetailViewTab(evt, targetPanelId) {
+            document.querySelectorAll('.detail-tab-btn').forEach(b => b.classList.remove('active'));
+            document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+            evt.currentTarget.classList.add('active');
+            document.getElementById(targetPanelId).classList.add('active');
+        }
+
+        // Automatic On-Demand Leaflet Routing Marker Injection Pipeline
+        window.addEventListener('DOMContentLoaded', () => {
+            setTimeout(() => {
+                const mapTarget = document.getElementById('detailHostelMap');
+                if (mapTarget) {
+                    // Pull runtime details safely, fallback to default parameters if unassigned
+                    const currentLat = window.currentActiveHostelLat || 18.5204;
+                    const currentLng = window.currentActiveHostelLng || 73.8567;
+                    const propertyTitle = document.getElementById('detailName')?.innerText || "Hostel Location";
+
+                    const hostelMapInstance = L.map('detailHostelMap').setView([currentLat, currentLng], 15);
+                    
+                    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                        attribution: '&copy; OpenStreetMap contributors'
+                    }).addTo(hostelMapInstance);
+
+                    L.marker([currentLat, currentLng]).addTo(hostelMapInstance)
+                        .bindPopup(`<b style="color: var(--primary); font-family: 'Inter', sans-serif;">${propertyTitle}</b>`)
+                        .openPopup();
+                }
+            }, 600); // 600ms latency protection buffer allows backend array files to inject data securely
+        });
+    </script>
 </body>
 </html>
